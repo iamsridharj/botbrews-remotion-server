@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { continueRender, delayRender } from "remotion";
 
 import { CompositionProps } from "../../common.types";
@@ -14,7 +14,7 @@ export interface BrighterSideScene {
   type: string;
   backgroundImage?: string;
   startFrame?: number;
-  sceneDurationInFrame?: number;
+  sceneDurationInFrame: number; // Ensure this is always a number
   metadata: {
     introTitle?: string;
     sceneTitle?: string;
@@ -31,65 +31,50 @@ export const useBrighterSideCompositionConfig = (): CompositionProps => {
   const { getJsonData } = useBrighterSideApi();
   const [handle] = useState(() => delayRender());
 
-  const init = async () => {
+  const calculateFrames = async (audio: string, additionalFrames: number = 0): Promise<number> => {
+    const duration = await calculateSceneDuration(audio) || 0;
+    return (duration * FPS) + additionalFrames;
+  };
+
+  const createScene = async (text: string, audio: string, type: string, startFrame: number, additionalFrames: number, metadata: Record<string, any>): Promise<BrighterSideScene> => {
+    const sceneDurationInFrame = await calculateFrames(audio, additionalFrames);
+    return {
+      text,
+      audio,
+      type,
+      startFrame,
+      sceneDurationInFrame,
+      metadata,
+    };
+  };
+
+  const init = useCallback(async () => {
     try {
       const response = await getJsonData();
       if (!response?.sections.length) return;
 
       let totalDurationInFrames = 0;
       let currentFrame = 0;
-
-      const updatedScenes = [];
-
+      const updatedScenes: BrighterSideScene[] = [];
 
       // Process intro
-      const introDurationInFrames = (await calculateSceneDuration(response.intro.audio) || 0) * FPS + 2 * FPS;
-      updatedScenes.push({
-        text: response.intro.text,
-        audio: response.intro.audio,
-        type: "intro",
-        startFrame: 0,
-        sceneDurationInFrame: introDurationInFrames,
-        metadata: {
-          sceneTitle: "Introduction",
-        },
-      });
-      currentFrame += introDurationInFrames;
-      totalDurationInFrames += introDurationInFrames;
+      const introScene = await createScene(response.intro.text, response.intro.audio, "intro", currentFrame, 2 * FPS, { sceneTitle: "Introduction" });
+      updatedScenes.push(introScene);
+      currentFrame += introScene.sceneDurationInFrame;
+      totalDurationInFrames += introScene.sceneDurationInFrame;
 
       // Process sections
       for (const section of response.sections) {
-        const audioDurationInFrames = (await calculateSceneDuration(section.audio) || 0) * FPS + section.pause_duration * FPS;
-        let startFrame = Math.round(currentFrame);
-        let endFrame = Math.round(currentFrame + audioDurationInFrames);
-        currentFrame = endFrame;
-        updatedScenes.push({
-          text: section.content,
-          audio: section.audio,
-          type: "section",
-          duration: audioDurationInFrames,
-          startFrame: startFrame,
-          sceneDurationInFrame: endFrame - startFrame,
-          metadata: {
-            sceneTitle: section.title,
-          },
-        });
-        totalDurationInFrames += audioDurationInFrames;
+        const sectionScene = await createScene(section.content, section.audio, "section", currentFrame, section.pause_duration * FPS, { sceneTitle: section.title });
+        updatedScenes.push(sectionScene);
+        currentFrame += sectionScene.sceneDurationInFrame;
+        totalDurationInFrames += sectionScene.sceneDurationInFrame;
       }
 
       // Process closing
-      const closingDurationInFrames = (await calculateSceneDuration(response.closing.audio) || 0) * FPS + 2 * FPS;
-      updatedScenes.push({
-        text: response.closing.thanks,
-        audio: response.closing.audio,
-        startFrame: currentFrame,
-        type: "outro",
-        sceneDurationInFrame: closingDurationInFrames,
-        metadata: {
-          sceneTitle: "Closing",
-        },
-      });
-      totalDurationInFrames += closingDurationInFrames;
+      const closingScene = await createScene(response.closing.thanks, response.closing.audio, "outro", currentFrame, 2 * FPS, { sceneTitle: "Closing" });
+      updatedScenes.push(closingScene);
+      totalDurationInFrames += closingScene.sceneDurationInFrame;
 
       setScenes(updatedScenes);
       setDurationInFrames(Math.round(totalDurationInFrames));
@@ -99,17 +84,13 @@ export const useBrighterSideCompositionConfig = (): CompositionProps => {
       console.error("Error fetching data:", error);
       // Handle the error appropriately here (e.g., show a notification to the user)
     }
-  };
+  }, [getJsonData, handle]);
 
   useEffect(() => {
-    try {
-      init();
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+    init();
+  }, [init]);
 
-  return ({
+  return {
     id: BRIGHTER_SIDE_REMOTION,
     component: BrighterSideRemotion,
     durationInFrames,
@@ -117,8 +98,8 @@ export const useBrighterSideCompositionConfig = (): CompositionProps => {
     width: 1920,
     height: 1080,
     defaultProps: {
-      scenes, 
-      videoTitle
-    }
-  });
+      scenes,
+      videoTitle,
+    },
+  };
 };

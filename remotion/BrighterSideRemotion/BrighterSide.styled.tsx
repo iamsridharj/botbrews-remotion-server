@@ -74,7 +74,7 @@ export const StyledLogoAndWaveformRow = styled.div`
   height: 20%;
   display: flex;
   flex-direction: row;
-  gap:500px
+  gap:500px;
 `;
 
 export const StyledLogoWrapper = styled.div`
@@ -112,3 +112,22 @@ export const WebsiteText = styled.div`
   font-size: 30px;
   margin: 10px;  
 `
+
+
+export const StyledPodcastNameHeader = styled.div`
+  font-size: 50px;
+  padding-left: 30px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+
+
+  > p {
+    margin: 0px;
+  }
+  
+  > span {
+    font-weight: 100;
+    font-style: normal;
+  }
+`;

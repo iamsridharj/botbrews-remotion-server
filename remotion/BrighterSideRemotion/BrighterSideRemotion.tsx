@@ -1,11 +1,8 @@
 import React, { FC } from "react";
-import { AbsoluteFill, Sequence, staticFile, Audio, Img } from "remotion";
-import styled from "styled-components";
+import { Sequence, staticFile, Audio, Img } from "remotion";
 import { BrighterSideScene } from "./hooks/useBrighterSiderCompositionConfig";
-import { SceneTitle } from "./components/SceneTitle/SceneTitle";
 import { AudioWaveform } from "./components/Waveform/Waveform";
 import {
-  TitleContainer,
   VisualizerContainer,
   StyledSequenceWrapper,
   StyledLogoAndWaveformRow,
@@ -15,6 +12,7 @@ import {
   SceneText,
   NotificationText,
   WebsiteText,
+  StyledPodcastNameHeader,
 } from "./BrighterSide.styled";
 
 import * as robotoLoad from "@remotion/google-fonts/Roboto";
@@ -23,23 +21,6 @@ import * as RobotoMonoLoad from "@remotion/google-fonts/RobotoMono";
 robotoLoad.loadFont();
 RobotoMonoLoad.loadFont();
 
-const StyledHeader = styled.div`
-  font-size: 50px;
-  padding-left: 30px;
-  font-family: "Roboto", sans-serif;
-  font-weight: 700;
-  font-style: normal;
-
-
-  > p {
-    margin: 0px;
-  }
-  
-  > span {
-    font-weight: 100;
-    font-style: normal;
-  }
-`;
 
 export const BrighterSideRemotion: FC<Record<string, any>> = ({ scenes }) => {
 
@@ -52,10 +33,10 @@ export const BrighterSideRemotion: FC<Record<string, any>> = ({ scenes }) => {
               <StyledLogoAndWaveformRow>
                 <StyledLogoWrapper>
                   <StyledLogo src={staticFile("brighterside_logo.jpeg")} />
-                  <StyledHeader>
+                  <StyledPodcastNameHeader>
                     THE BRIGHTER <p>SIDE</p>
                     <span>Podcast</span>
-                  </StyledHeader>
+                  </StyledPodcastNameHeader>
                 </StyledLogoWrapper>
                 {
                   scene.type === "intro" ? <Audio volume={0.02} src={staticFile("brighterside_intro.mp3")} /> : null
