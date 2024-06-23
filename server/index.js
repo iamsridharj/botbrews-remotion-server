@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const codeTutRoutes = require("./routes/codeTut.route");
 const brighterSideRoutes = require("./routes/brighterSide.route");
 
 const app = express();
@@ -10,7 +9,6 @@ const host = 'localhost';
 
 app.use(cors());
 
-app.use("/code-tut", codeTutRoutes);
 app.use("/brighter-side", brighterSideRoutes);
 
 app.get('/audio', (req, res) => {
