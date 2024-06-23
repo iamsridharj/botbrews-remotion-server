@@ -1,7 +1,9 @@
 const path = require("path");
 const fs = require("fs");
+const axios = require("axios")
 
 const runCommand = require("../utils/runCommand");
+const mockData = require("../mocks/brightSide.mock")
 const { handleFullRequest, handleRangeRequest } = require("../utils/videoRender")
 
 const renderVideo = async (req, res) => {
@@ -19,13 +21,14 @@ const renderVideo = async (req, res) => {
 };
 
 const getJsonData = async (req, res) => {
-  try {
-    const response = await axios.get('https://api.byteshop.in/podcast/brighterside/data.json');
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ message: 'Error fetching data' });
-  }
+  // try {
+  //   const response = await axios.get('https://api.byteshop.in/podcast/brighterside/data.json');
+  //   res.status(200).json(response.data);
+  // } catch (error) {
+  //   console.error('Error fetching data:', error);
+  //   res.status(500).json({ message: 'Error fetching data' });
+  // }
+  res.json(mockData.defaults)
 }
 
 module.exports = {

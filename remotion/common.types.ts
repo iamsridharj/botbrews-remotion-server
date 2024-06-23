@@ -8,4 +8,5 @@ export interface CompositionProps<T = Record<string, any>> {
   width: number;
   height: number;
   defaultProps: T;
+  init?: () => void
 }

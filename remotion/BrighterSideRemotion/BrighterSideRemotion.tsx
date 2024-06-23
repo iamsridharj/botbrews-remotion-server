@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { Sequence, staticFile, Audio, Img } from "remotion";
 import { BrighterSideScene } from "./hooks/useBrighterSiderCompositionConfig";
 import { AudioWaveform } from "./components/Waveform/Waveform";
@@ -22,8 +22,11 @@ robotoLoad.loadFont();
 RobotoMonoLoad.loadFont();
 
 
-export const BrighterSideRemotion: FC<Record<string, any>> = ({ scenes }) => {
+export const BrighterSideRemotion: FC<Record<string, any>> = ({ scenes, init }) => {
 
+  useEffect(() => {
+    if (init) init()
+  }, [init])
   return (
     <VisualizerContainer>
       {scenes.map((scene: BrighterSideScene, index: number) => {

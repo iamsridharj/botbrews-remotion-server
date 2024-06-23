@@ -86,10 +86,6 @@ export const useBrighterSideCompositionConfig = (): CompositionProps => {
     }
   }, [getJsonData, handle]);
 
-  useEffect(() => {
-    init();
-  }, [init]);
-
   return {
     id: BRIGHTER_SIDE_REMOTION,
     component: BrighterSideRemotion,
@@ -100,6 +96,7 @@ export const useBrighterSideCompositionConfig = (): CompositionProps => {
     defaultProps: {
       scenes,
       videoTitle,
+      init
     },
   };
 };
