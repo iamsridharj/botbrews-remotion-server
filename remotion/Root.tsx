@@ -1,38 +1,29 @@
 import { Composition } from "remotion";
-import { Main } from "./MyComp/Main";
 import {
-  COMP_NAME,
-  defaultMyCompProps,
   DURATION_IN_FRAMES,
-  VIDEO_FPS,
-  VIDEO_HEIGHT,
-  VIDEO_WIDTH,
 } from "../types/constants";
-import { NextLogo } from "./MyComp/NextLogo";
+import { useCompositionConfig } from "./useCompositionConfig";
 
 export const RemotionRoot: React.FC = () => {
+  const { compositions } = useCompositionConfig();
+
   return (
     <>
-      <Composition
-        id={COMP_NAME}
-        component={Main}
-        durationInFrames={DURATION_IN_FRAMES}
-        fps={VIDEO_FPS}
-        width={VIDEO_WIDTH}
-        height={VIDEO_HEIGHT}
-        defaultProps={defaultMyCompProps}
-      />
-      <Composition
-        id="NextLogo"
-        component={NextLogo}
-        durationInFrames={300}
-        fps={30}
-        width={140}
-        height={140}
-        defaultProps={{
-          outProgress: 0,
-        }}
-      />
+      {
+        compositions.map(composition => (
+          <Composition
+            key={composition.id}
+            id={composition.id}
+            component={composition.component}
+            durationInFrames={composition.durationInFrames || DURATION_IN_FRAMES}
+            fps={composition.fps}
+            width={composition.width}
+            height={composition.height}
+            defaultProps={{ ...composition.defaultProps }}
+          />
+        ))
+      }
+
     </>
   );
 };
